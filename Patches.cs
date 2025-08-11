@@ -1,7 +1,8 @@
 using System;
 using HarmonyLib;
 using UnityEngine;
-using UnityEngine.Diagnostics;
+
+using static HeavyRain.Settings;
 using static UnityEngine.ParticleSystem;
 using Random = UnityEngine.Random;
 
@@ -30,15 +31,22 @@ namespace HeavyRain
     // 	}
     // }
 
+    // TODO : Orient rain when we move ?
+    // TODO : Add wind for both rain and snow ?
+
     [HarmonyPatch(typeof(PlayerCollider), "Start")]
-    static class RainSetter
+    static class VFXSetter
     {
         const int defaultRainEmission = 1000;
         const int defaultRainLimit = 500;
 
-        private static ParticleSystem rainVFX;
+        const int defaultSnowEmission = 2550;
+        const int defaultSnowLimit = 2000;
 
-        public static void SetRain(Settings.Multiplier rainMultiplier)
+        private static ParticleSystem rainVFX;
+        private static ParticleSystem snowVFX;
+
+        public static void SetRain(Multiplier rainMultiplier)
         {
             if (!Main.enabled || rainVFX == null)
                 return;
@@ -55,23 +63,60 @@ namespace HeavyRain
             main.startColor = new MinMaxGradient(color);
         }
 
+        public static void SetSnow(Multiplier snowMultiplier)
+        {
+            Main.Log("test 1");
+
+            if (!Main.enabled || snowVFX == null)
+                return;
+
+            Main.Log("test 2");
+
+            EmissionModule emission = snowVFX.emission;
+            MainModule main = snowVFX.main;
+
+            Main.Log("test 3");
+
+            int multiplier = (int)snowMultiplier;
+            emission.rateOverTime = new MinMaxCurve(defaultSnowEmission * multiplier);
+            main.maxParticles = defaultSnowLimit * multiplier;
+
+            Main.Log("new snow rate : " + emission.rateOverTime.constant);
+            Main.Log("new snow limit : " + main.maxParticles);
+        }
+
         private static void Postfix()
         {
-            rainVFX = GameObject.Find("RainParticles").GetComponent<ParticleSystem>();
+            Multiplier[] multipliers = (Multiplier[])Enum.GetValues(typeof(Multiplier));
+            GameObject rainObj = GameObject.Find("RainParticles");
 
-            if (rainVFX != null)
-                Main.Log("Found rain VFX");
-
-            Settings.Multiplier rainMultiplier = Main.settings.rainMultiplier;
-
-            if (Main.settings.rainRandomIntensity)
+            if (rainObj != null)
             {
-                Settings.Multiplier[] multipliers = (Settings.Multiplier[])Enum.GetValues(typeof(Settings.Multiplier));
-                rainMultiplier = multipliers[Random.Range(0, multipliers.Length)];
+                Main.Log("Found rain VFX");
+                rainVFX = rainObj.GetComponent<ParticleSystem>();
+                Multiplier rainMultiplier = Main.settings.rainMultiplier;
+
+                if (Main.settings.rainRandomIntensity)
+                    rainMultiplier = multipliers[Random.Range(0, multipliers.Length)];
+
+                SetRain(rainMultiplier);
+                Main.Log("Applied rain multiplier : " + rainMultiplier);
             }
 
-            SetRain(rainMultiplier);
-            Main.Log("Applied rain multiplier : " + rainMultiplier);
+            GameObject snowObj = GameObject.Find("SnowParticles");
+
+            if (snowObj != null)
+            {
+                Main.Log("Found snow VFX");
+                snowVFX = snowObj.GetComponent<ParticleSystem>();
+                Multiplier snowMultiplier = Main.settings.snowMultiplier;
+
+                if (Main.settings.snowRandomIntensity)
+                    snowMultiplier = multipliers[Random.Range(0, multipliers.Length)];
+
+                SetSnow(snowMultiplier);
+                Main.Log("Applied snow multiplier : " + snowMultiplier);
+            }
         }
     }
 }
