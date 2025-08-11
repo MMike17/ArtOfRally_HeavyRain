@@ -1,6 +1,6 @@
 using HarmonyLib;
 
-namespace ModBase
+namespace HeavyRain
 {
 	// Patch model
 	// [HarmonyPatch(typeof(), nameof())]
