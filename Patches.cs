@@ -1,7 +1,9 @@
+using System;
 using HarmonyLib;
 using UnityEngine;
-
+using UnityEngine.Diagnostics;
 using static UnityEngine.ParticleSystem;
+using Random = UnityEngine.Random;
 
 namespace HeavyRain
 {
@@ -28,7 +30,7 @@ namespace HeavyRain
     // 	}
     // }
 
-    [HarmonyPatch(typeof(EventManager), MethodType.Constructor)]
+    [HarmonyPatch(typeof(PlayerCollider), "Start")]
     static class RainSetter
     {
         const int defaultRainEmission = 1000;
@@ -36,16 +38,16 @@ namespace HeavyRain
 
         private static ParticleSystem rainVFX;
 
-        public static void SetRain()
+        public static void SetRain(Settings.Multiplier rainMultiplier)
         {
-            if (!Main.enabled)
+            if (!Main.enabled || rainVFX == null)
                 return;
 
             EmissionModule emission = rainVFX.emission;
             MainModule main = rainVFX.main;
 
-            int multiplier = (int)Main.settings.rainMultiplier;
-            emission.rateOverTime = defaultRainEmission * multiplier;
+            int multiplier = (int)rainMultiplier;
+            emission.rateOverTime = new MinMaxCurve(defaultRainEmission * multiplier);
             main.maxParticles = defaultRainLimit * multiplier;
 
             Color color = main.startColor.color;
@@ -53,10 +55,23 @@ namespace HeavyRain
             main.startColor = new MinMaxGradient(color);
         }
 
-        static void Postfix()
+        private static void Postfix()
         {
             rainVFX = GameObject.Find("RainParticles").GetComponent<ParticleSystem>();
-            Main.Log("Found rain VFX : " + (rainVFX != null));
+
+            if (rainVFX != null)
+                Main.Log("Found rain VFX");
+
+            Settings.Multiplier rainMultiplier = Main.settings.rainMultiplier;
+
+            if (Main.settings.rainRandomIntensity)
+            {
+                Settings.Multiplier[] multipliers = (Settings.Multiplier[])Enum.GetValues(typeof(Settings.Multiplier));
+                rainMultiplier = multipliers[Random.Range(0, multipliers.Length)];
+            }
+
+            SetRain(rainMultiplier);
+            Main.Log("Applied rain multiplier : " + rainMultiplier);
         }
     }
 }

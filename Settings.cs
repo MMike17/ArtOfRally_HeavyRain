@@ -13,13 +13,17 @@ namespace HeavyRain
         {
             x1 = 1,
             x10 = 10,
-            x100 = 100
+            x20 = 20,
+            x100 = 100,
+            x200 = 200
         }
 
         // [Draw(DrawType.)]
 
         [Header("Rain")]
         [Draw(DrawType.Auto)]
+        public bool rainRandomIntensity;
+        [Draw(DrawType.Auto, InvisibleOn = "rainRandomIntensity|true")]
         public Multiplier rainMultiplier = Multiplier.x10;
         [Draw(DrawType.Slider, Min = 0, Max = 1)]
         public float rainAlpha = 0.15f;
@@ -35,7 +39,7 @@ namespace HeavyRain
 
         public void OnChange()
         {
-            RainSetter.SetRain();
+            RainSetter.SetRain(rainMultiplier);
 
             //Main.SetMarkers(showMarkers);
             // SnapValue(, 0.1f);
@@ -51,12 +55,12 @@ namespace HeavyRain
 
         internal void OnGUI()
         {
-            if (GUILayout.Button("Reset rain settings"))
+            if (GUILayout.Button("Reset rain settings", GUILayout.Width(250)))
             {
                 rainMultiplier = Multiplier.x1;
                 rainAlpha = defaultRainAlpha;
 
-                RainSetter.SetRain();
+                RainSetter.SetRain(rainMultiplier);
             }
         }
     }
