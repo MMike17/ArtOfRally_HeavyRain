@@ -35,7 +35,11 @@ namespace HeavyRain
 
             // hook in mod manager event
             modEntry.OnToggle = OnToggleEvent;
-            modEntry.OnGUI = settings.Draw;
+            modEntry.OnGUI = (entry) =>
+            {
+                settings.Draw(entry);
+                settings.OnGUI();
+            };
             modEntry.OnSaveGUI = settings.Save;
 
             markers = new List<GameObject>();
