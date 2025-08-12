@@ -47,6 +47,17 @@ namespace HeavyRain
             };
             modEntry.OnSaveGUI = settings.Save;
 
+            OnToggle += state =>
+            {
+                if (state)
+                    settings.OnChange();
+                else
+                {
+                    VFXSetter.ResetRain();
+                    VFXSetter.ResetSnow();
+                }
+            };
+
             markers = new List<GameObject>();
             return true;
         }

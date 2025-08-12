@@ -7,8 +7,6 @@ namespace HeavyRain
 {
     public class Settings : ModSettings, IDrawable
     {
-        readonly static float defaultRainAlpha = 0.372549f;
-
         public enum Multiplier
         {
             x1 = 1,
@@ -23,11 +21,11 @@ namespace HeavyRain
         [Draw(DrawType.Auto)]
         public bool rainRandomIntensity = true;
         [Draw(DrawType.Auto, InvisibleOn = "rainRandomIntensity|true")]
-        public Multiplier rainMultiplier = Multiplier.x10;
+        public Multiplier rainMultiplier = Multiplier.x20;
         [Draw(DrawType.Slider, Min = 0, Max = 1)]
         public float rainAlpha = 0.15f;
-        [Draw(DrawType.Slider, Min = 0, Max = 30)]
-        public float rainWindStrength = 15;
+        [Draw(DrawType.Slider, Min = 0, Max = 45)]
+        public float rainWindStrength = 20;
         [Draw(DrawType.Slider, Min = 0.1f, Max = 0.4f)]
         public float rainSpeedEffectThreshold = 0.25f;
         [Draw(DrawType.Slider, Min = 0, Max = 1)]
@@ -43,10 +41,7 @@ namespace HeavyRain
 
         [Header("Debug")]
         [Draw(DrawType.Toggle)]
-        public bool showMarkers;
-        [Draw(DrawType.Toggle)]
-        public bool disableInfoLogs = false;
-        //public bool disableInfoLogs = true;
+        public bool disableInfoLogs = true;
 
         public override void Save(ModEntry modEntry) => Save(this, modEntry);
 
@@ -54,17 +49,6 @@ namespace HeavyRain
         {
             VFXSetter.SetRain(rainMultiplier);
             VFXSetter.SetSnow(snowMultiplier);
-
-            //Main.SetMarkers(showMarkers);
-            // SnapValue(, 0.1f);
-        }
-
-        private float SnapValue(float value, float snapValue, float range, float snapPercent)
-        {
-            float snapDiff = range * snapPercent;
-            float minTarget = snapValue - snapDiff / 2;
-            float maxTarget = snapValue + snapDiff / 2;
-            return value <= maxTarget && value >= minTarget ? snapValue : value;
         }
 
         internal void OnGUI()
@@ -72,11 +56,15 @@ namespace HeavyRain
             if (GUILayout.Button("Reset rain settings", GUILayout.Width(250)))
             {
                 rainRandomIntensity = true;
-                rainMultiplier = Multiplier.x10;
-                rainAlpha = defaultRainAlpha;
+                rainMultiplier = Multiplier.x20;
+                rainAlpha = 0.15f;
+                rainWindStrength = 15;
+                rainSpeedEffectThreshold = 0.25f;
+                rainSpeeEffectDamping = 0.1f;
 
                 snowRandomIntensity = true;
                 snowMultiplier = Multiplier.x10;
+                snowWindStrength = 5;
 
                 VFXSetter.SetRain(rainMultiplier);
                 VFXSetter.SetSnow(snowMultiplier);

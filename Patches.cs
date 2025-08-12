@@ -14,6 +14,7 @@ namespace HeavyRain
         const int defaultRainEmission = 1000;
         const int defaultRainLimit = 500;
         const float maxCamVel = 1.16f;
+        const float defaultRainAlpha = 0.372549f;
 
         const int defaultSnowEmission = 2550;
         const int defaultSnowLimit = 2000;
@@ -61,6 +62,21 @@ namespace HeavyRain
             lastCamPos = Camera.main.transform.position;
         }
 
+        public static void ResetRain()
+        {
+            EmissionModule emission = rainVFX.emission;
+            MainModule main = rainVFX.main;
+
+            emission.rateOverTime = new MinMaxCurve(defaultRainEmission);
+            main.maxParticles = defaultRainLimit;
+
+            Color color = main.startColor.color;
+            color.a = defaultRainAlpha;
+            main.startColor = new MinMaxGradient(color);
+
+            rainVFX.transform.rotation = Quaternion.identity;
+        }
+
         public static void SetSnow(Multiplier snowMultiplier)
         {
             if (!Main.enabled || snowVFX == null)
@@ -88,6 +104,15 @@ namespace HeavyRain
                 particles[i].position += windVector * delta;
 
             snowVFX.SetParticles(particles);
+        }
+
+        public static void ResetSnow()
+        {
+            EmissionModule emission = snowVFX.emission;
+            MainModule main = snowVFX.main;
+
+            emission.rateOverTime = new MinMaxCurve(defaultSnowEmission);
+            main.maxParticles = defaultSnowLimit;
         }
 
         private static void Postfix()
