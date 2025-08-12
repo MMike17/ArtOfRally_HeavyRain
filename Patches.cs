@@ -77,11 +77,20 @@ namespace HeavyRain
             int multiplier = (int)snowMultiplier;
             emission.rateOverTime = new MinMaxCurve(defaultSnowEmission * multiplier);
             main.maxParticles = defaultSnowLimit * multiplier;
+        }
 
-            VelocityOverLifetimeModule vel = snowVFX.velocityOverLifetime;
-            vel.enabled = true;
-            vel.x = new MinMaxCurve(windDir.x * Main.settings.snowWindStrength);
-            vel.z = new MinMaxCurve(windDir.z * Main.settings.snowWindStrength);
+        public static void ApplySnowWind(float delta)
+        {
+            if (!Main.enabled || snowVFX == null)
+                return;
+
+            Particle[] particles = new Particle[snowVFX.particleCount];
+            snowVFX.GetParticles(particles);
+
+            for (int i = 0; i < particles.Length; i++)
+                particles[i].position += windDir * Main.settings.snowWindStrength * delta;
+
+            snowVFX.SetParticles(particles);
         }
 
         private static void Postfix()

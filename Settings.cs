@@ -14,6 +14,7 @@ namespace HeavyRain
             x1 = 1,
             x10 = 10,
             x20 = 20,
+            x50 = 50,
             x100 = 100,
             x200 = 200
         }
@@ -35,8 +36,8 @@ namespace HeavyRain
         public bool snowRandomIntensity = true;
         [Draw(DrawType.Auto, InvisibleOn = "snowRandomIntensity|true")]
         public Multiplier snowMultiplier = Multiplier.x10;
-        [Draw(DrawType.Slider, Min = 0, Max = 100)]
-        public float snowWindStrength = 0.3f;
+        [Draw(DrawType.Slider, Min = 0, Max = 15)]
+        public float snowWindStrength = 5;
 
         [Header("Debug")]
         [Draw(DrawType.Toggle)]
@@ -50,7 +51,7 @@ namespace HeavyRain
         public void OnChange()
         {
             VFXSetter.SetRain(rainMultiplier);
-            VFXSetter.SetSnow(rainMultiplier);
+            VFXSetter.SetSnow(snowMultiplier);
 
             //Main.SetMarkers(showMarkers);
             // SnapValue(, 0.1f);

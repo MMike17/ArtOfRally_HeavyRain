@@ -40,6 +40,10 @@ namespace HeavyRain
                 settings.Draw(entry);
                 settings.OnGUI();
             };
+            modEntry.OnUpdate = (entry, delta) =>
+            {
+                VFXSetter.ApplySnowWind(delta);
+            };
             modEntry.OnSaveGUI = settings.Save;
 
             markers = new List<GameObject>();
