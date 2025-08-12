@@ -66,8 +66,7 @@ namespace HeavyRain
                 snowMultiplier = Multiplier.x10;
                 snowWindStrength = 5;
 
-                VFXSetter.SetRain(rainMultiplier);
-                VFXSetter.SetSnow(snowMultiplier);
+                OnChange();
             }
         }
     }
