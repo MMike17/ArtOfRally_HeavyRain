@@ -45,6 +45,7 @@ namespace HeavyRain
 
         private static ParticleSystem rainVFX;
         private static ParticleSystem snowVFX;
+        private static Vector3 windDir;
 
         public static void SetRain(Multiplier rainMultiplier)
         {
@@ -61,33 +62,33 @@ namespace HeavyRain
             Color color = main.startColor.color;
             color.a = Main.settings.rainAlpha;
             main.startColor = new MinMaxGradient(color);
+
+            rainVFX.transform.rotation = Quaternion.Euler(windDir * Main.settings.rainWindStrength);
         }
 
         public static void SetSnow(Multiplier snowMultiplier)
         {
-            Main.Log("test 1");
-
             if (!Main.enabled || snowVFX == null)
                 return;
 
-            Main.Log("test 2");
-
             EmissionModule emission = snowVFX.emission;
             MainModule main = snowVFX.main;
-
-            Main.Log("test 3");
 
             int multiplier = (int)snowMultiplier;
             emission.rateOverTime = new MinMaxCurve(defaultSnowEmission * multiplier);
             main.maxParticles = defaultSnowLimit * multiplier;
 
-            Main.Log("new snow rate : " + emission.rateOverTime.constant);
-            Main.Log("new snow limit : " + main.maxParticles);
+            VelocityOverLifetimeModule vel = snowVFX.velocityOverLifetime;
+            vel.enabled = true;
+            vel.x = new MinMaxCurve(windDir.x * Main.settings.snowWindStrength);
+            vel.z = new MinMaxCurve(windDir.z * Main.settings.snowWindStrength);
         }
 
         private static void Postfix()
         {
+            windDir = new Vector3(Random.insideUnitCircle.x, 0, Random.insideUnitCircle.y);
             Multiplier[] multipliers = (Multiplier[])Enum.GetValues(typeof(Multiplier));
+
             GameObject rainObj = GameObject.Find("RainParticles");
 
             if (rainObj != null)

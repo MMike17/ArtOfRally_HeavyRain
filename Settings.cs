@@ -27,12 +27,16 @@ namespace HeavyRain
         public Multiplier rainMultiplier = Multiplier.x10;
         [Draw(DrawType.Slider, Min = 0, Max = 1)]
         public float rainAlpha = 0.15f;
+        [Draw(DrawType.Slider, Min = 0, Max = 30)]
+        public float rainWindStrength = 15;
 
         [Header("Snow")]
         [Draw(DrawType.Auto)]
         public bool snowRandomIntensity = true;
         [Draw(DrawType.Auto, InvisibleOn = "snowRandomIntensity|true")]
         public Multiplier snowMultiplier = Multiplier.x10;
+        [Draw(DrawType.Slider, Min = 0, Max = 100)]
+        public float snowWindStrength = 0.3f;
 
         [Header("Debug")]
         [Draw(DrawType.Toggle)]
