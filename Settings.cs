@@ -19,8 +19,6 @@ namespace HeavyRain
             x200 = 200
         }
 
-        // [Draw(DrawType.)]
-
         [Header("Rain")]
         [Draw(DrawType.Auto)]
         public bool rainRandomIntensity = true;
@@ -30,6 +28,10 @@ namespace HeavyRain
         public float rainAlpha = 0.15f;
         [Draw(DrawType.Slider, Min = 0, Max = 30)]
         public float rainWindStrength = 15;
+        [Draw(DrawType.Slider, Min = 0.1f, Max = 0.4f)]
+        public float rainSpeedEffectThreshold = 0.25f;
+        [Draw(DrawType.Slider, Min = 0, Max = 1)]
+        public float rainSpeeEffectDamping = 0.1f;
 
         [Header("Snow")]
         [Draw(DrawType.Auto)]

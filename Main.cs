@@ -40,9 +40,10 @@ namespace HeavyRain
                 settings.Draw(entry);
                 settings.OnGUI();
             };
-            modEntry.OnUpdate = (entry, delta) =>
+            modEntry.OnLateUpdate = (entry, delta) =>
             {
                 VFXSetter.ApplySnowWind(delta);
+                VFXSetter.ApplyRainWind(delta);
             };
             modEntry.OnSaveGUI = settings.Save;
 

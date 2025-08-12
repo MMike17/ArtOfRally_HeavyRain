@@ -8,37 +8,12 @@ using Random = UnityEngine.Random;
 
 namespace HeavyRain
 {
-    // Patch model
-    // [HarmonyPatch(typeof(), nameof())]
-    // [HarmonyPatch(typeof(), MethodType.)]
-    // static class type_method_Patch
-    // {
-    // 	static void Prefix()
-    // 	{
-    // 		//
-    // 	}
-
-    //	this will negate the method
-    //  	static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-    //  	{
-    //      	foreach (var instruction in instructions)
-    //          	yield return new CodeInstruction(OpCodes.Ret);
-    //  	}
-
-    // 	static void Postfix()
-    // 	{
-    // 		//
-    // 	}
-    // }
-
-    // TODO : Orient rain when we move ?
-    // TODO : Add wind for both rain and snow ?
-
     [HarmonyPatch(typeof(PlayerCollider), "Start")]
     static class VFXSetter
     {
         const int defaultRainEmission = 1000;
         const int defaultRainLimit = 500;
+        const float maxCamVel = 1.16f;
 
         const int defaultSnowEmission = 2550;
         const int defaultSnowLimit = 2000;
@@ -46,6 +21,8 @@ namespace HeavyRain
         private static ParticleSystem rainVFX;
         private static ParticleSystem snowVFX;
         private static Vector3 windDir;
+        private static Vector3 windVector;
+        private static Vector3 lastCamPos;
 
         public static void SetRain(Multiplier rainMultiplier)
         {
@@ -63,7 +40,25 @@ namespace HeavyRain
             color.a = Main.settings.rainAlpha;
             main.startColor = new MinMaxGradient(color);
 
-            rainVFX.transform.rotation = Quaternion.Euler(windDir * Main.settings.rainWindStrength);
+            windVector = windDir * Main.settings.rainWindStrength;
+            rainVFX.transform.rotation = Quaternion.Euler(windVector);
+        }
+
+        public static void ApplyRainWind(float delta)
+        {
+            if (!Main.enabled || rainVFX == null)
+                return;
+
+            Vector3 velocity = Camera.main.transform.position - lastCamPos;
+            float percent = Mathf.InverseLerp(0, maxCamVel * Main.settings.rainSpeedEffectThreshold, velocity.magnitude);
+
+            rainVFX.transform.up = Vector3.Lerp(
+                Vector3.up + windVector * delta,
+                velocity,
+                percent * (1 - Main.settings.rainSpeeEffectDamping)
+            );
+
+            lastCamPos = Camera.main.transform.position;
         }
 
         public static void SetSnow(Multiplier snowMultiplier)
@@ -77,6 +72,8 @@ namespace HeavyRain
             int multiplier = (int)snowMultiplier;
             emission.rateOverTime = new MinMaxCurve(defaultSnowEmission * multiplier);
             main.maxParticles = defaultSnowLimit * multiplier;
+
+            windVector = windDir * Main.settings.snowWindStrength;
         }
 
         public static void ApplySnowWind(float delta)
@@ -88,7 +85,7 @@ namespace HeavyRain
             snowVFX.GetParticles(particles);
 
             for (int i = 0; i < particles.Length; i++)
-                particles[i].position += windDir * Main.settings.snowWindStrength * delta;
+                particles[i].position += windVector * delta;
 
             snowVFX.SetParticles(particles);
         }
