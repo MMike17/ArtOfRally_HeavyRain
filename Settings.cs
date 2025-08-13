@@ -53,7 +53,7 @@ namespace HeavyRain
 
         internal void OnGUI()
         {
-            if (GUILayout.Button("Reset rain settings", GUILayout.Width(250)))
+            if (GUILayout.Button("Reset settings", GUILayout.Width(250)))
             {
                 rainRandomIntensity = true;
                 rainMultiplier = Multiplier.x20;
