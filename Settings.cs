@@ -58,7 +58,7 @@ namespace HeavyRain
                 rainRandomIntensity = true;
                 rainMultiplier = Multiplier.x20;
                 rainAlpha = 0.15f;
-                rainWindStrength = 15;
+                rainWindStrength = 20;
                 rainSpeedEffectThreshold = 0.25f;
                 rainSpeeEffectDamping = 0.1f;
 
